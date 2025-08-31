@@ -1,5 +1,6 @@
 "use client"
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import * as XLSX from "xlsx";
 
 /**
  * Arabic Cheque Printer (Egypt) – Single-file React App
@@ -256,7 +257,7 @@ function useLocalStorage(key, initial) {
       setState(initial);
     }
     setIsInitialized(true);
-  }, [key, initial]);
+  }, []);
 
   // Save to localStorage when state changes (but only after initialization)
   useEffect(() => {
@@ -284,7 +285,7 @@ export default function Dashboard() {
   const [selectedTemplateId, setSelectedTemplateId] = useLocalStorage(LSK.lastTemplateId, templates?.[0]?.id || "banquemisr");
   const currentTemplate = useMemo(() => templates.find(t => t.id === selectedTemplateId) || templates[0], [templates, selectedTemplateId]);
 
-  const [form, setForm] = useState({ payee: "", amount: "", date: "", memo: "", signature: "" });
+  const [form, setForm] = useState({ payee: " ", amount: " ", date: " ", memo: " ", signature: " " });
   
   // Initialize date after mounting to prevent hydration mismatch
   useEffect(() => {
@@ -313,6 +314,9 @@ export default function Dashboard() {
   const [selectedBgFile, setSelectedBgFile] = useState(null);
   const [selectedTemplateFile, setSelectedTemplateFile] = useState(null);
   const [useArabicNumerals, setUseArabicNumerals] = useState(true);
+//excel state
+const [useExcelRows, setUseExcelRows] = useState([])
+const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
 
   const amountNum = useMemo(() => {
     const amount = (form.amount || "").toString();
@@ -436,6 +440,84 @@ export default function Dashboard() {
   const cancelEditingTemplate = () => {
     setEditingTemplate(false);
     setTempTemplateName("");
+  };
+
+  //excel fucntions
+  const handleExcelImport = async (e) => {
+    console.log("excel func1")
+    const file = e.target.files?.[0];
+    if (!file) 
+    {console.log("no excel file");
+      return;
+    }
+     
+
+    const data = await file.arrayBuffer();
+    const workbook = XLSX.read(data);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+    console.log(json)
+    // Skip header row
+    const values = json.slice(1).map((row) => ({
+      amount: row[0],
+      name: row[1],
+      date: row[2],
+      bank: row[3],
+    }));
+    console.log("values",values)
+    setUseExcelRows(values);
+    setUseCurruntRowIndex(0);
+    
+    if (values.length > 0) {
+      // Auto-select bank template based on bank name from Excel
+      const firstRow = values[0];
+      // autoSelectBankTemplate(firstRow.bank);
+      
+      // Fill form with first row data
+      setForm({
+        payee: firstRow.name,
+        amount: firstRow.amount,
+        date: firstRow.date,
+        bank: firstRow.bank,
+      });
+    }
+    console.log("current",currentTemplate)
+  };
+
+  const handleNext = () => {
+    if (useCurruntRowIndex < useExcelRows.length - 1) {
+      const newIndex = useCurruntRowIndex + 1;
+      setUseCurruntRowIndex(newIndex);
+      const row = useExcelRows[newIndex];
+      
+      // Auto-select bank template for this row
+      // autoSelectBankTemplate(row.bank);
+      
+      setForm({
+        payee: row.name,
+        amount: row.amount,
+        date: row.date,
+        bank: row.bank,
+      });
+    }
+  };
+
+  const handlePrev = () => {
+    if (useCurruntRowIndex > 0) {
+      const newIndex = useCurruntRowIndex - 1;
+      setUseCurruntRowIndex(newIndex);
+      const row = useExcelRows[newIndex];
+      
+      // Auto-select bank template for this row
+      // autoSelectBankTemplate(row.bank);
+      
+      setForm({
+        payee: row.name,
+        amount: row.amount,
+        date: row.date,
+        bank: row.bank,
+      });
+    }
   };
 
   const applyDimensionPreset = (presetKey) => {
@@ -809,6 +891,61 @@ export default function Dashboard() {
             >
               {isLoading.print ? 'جاري التحضير...' : '🖨️ طباعة'}
             </button>
+            <button 
+              className="px-3 py-1.5 rounded-2xl text-sm border bg-white text-blue-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium" 
+              onClick={handleNext}
+              disabled={useExcelRows.length < 1}
+            >
+              Next
+            </button>
+            <button 
+              className="px-3 py-1.5 rounded-2xl text-sm border bg-white text-blue-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium" 
+              disabled={useExcelRows.length < 1}
+            >
+              {useExcelRows.length > 0 ? `${useCurruntRowIndex + 1} / ${useExcelRows.length}` : '0 / 0'}
+            </button>
+            <button 
+              className="px-3 py-1.5 rounded-2xl text-sm border bg-white text-blue-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium" 
+              onClick={handlePrev}
+              disabled={useExcelRows.length < 1}
+            >
+              Previous
+            </button>
+            <button 
+              className="px-3 py-1.5 rounded-2xl text-sm border bg-white text-blue-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"             >
+               {/* Import Excel Button */}
+            <div className=" bg-blue-50 border border-blue-200 rounded-xl">
+                <div className="relative">
+                  <input 
+                    id="template-import"
+                    type="file" 
+                    accept=".xlsx"
+                    onChange={handleExcelImport}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    title="Import Excel file"
+                  />
+                  <label 
+                    htmlFor="template-import"
+                    className={`flex items-center justify-center px-1 w-full border-2 border-dashed rounded-lg transition-colors cursor-pointer ${
+                      selectedTemplateFile 
+                        ? 'border-green-400 bg-green-50' 
+                        : 'border-blue-300 hover:border-blue-500 hover:bg-blue-100 bg-white'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{selectedTemplateFile ? '✅' : '📁'}</span>
+                      <div className="text-center">
+                        <div className="text-xs font-medium text-blue-700">
+                          {selectedTemplateFile ? selectedTemplateFile : 'select Excel file'}
+                        </div>
+                        
+                      </div>
+                    </div>
+                  </label>
+                </div>
+            </div>
+            
+            </button>
           </div>
         </div>
       </header>
@@ -1148,6 +1285,7 @@ export default function Dashboard() {
                 💡 نصيحة: صدّر قوالبك للاحتفاظ بها بعد التحديثات
               </p>
             </div>
+           
             
             <div className="col-span-2 mt-2">
               <button 
