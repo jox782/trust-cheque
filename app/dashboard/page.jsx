@@ -311,6 +311,7 @@ export default function Dashboard() {
   const [activeFieldId, setActiveFieldId] = useState(null);
   const [editingTemplate, setEditingTemplate] = useState(false);
   const [tempTemplateName, setTempTemplateName] = useState("");
+  const [tempTemplateId, setTempTemplateId] = useState("");
   const [selectedBgFile, setSelectedBgFile] = useState(null);
   const [selectedTemplateFile, setSelectedTemplateFile] = useState(null);
   const [useArabicNumerals, setUseArabicNumerals] = useState(true);
@@ -421,13 +422,17 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
 
   const saveTemplateName = () => {
     if (!tempTemplateName.trim()) {
-      showToast('يرجى إدخال اسم القالب', 'error');
+      showToast('Please Enter Template Name', 'error');
+      return;
+    }
+    if (!tempTemplateId.trim()) {
+      showToast('Please Enter Template ID', 'error');
       return;
     }
     
     setButtonLoading('saveTemplateName', true);
     try {
-      updateTemplate(t => ({ ...t, name: tempTemplateName.trim() }));
+      updateTemplate(t => ({ ...t, name: tempTemplateName.trim(),id: tempTemplateId.trim() }));
       setEditingTemplate(false);
       showToast('تم تحديث اسم القالب بنجاح', 'success');
     } catch (error) {
@@ -962,7 +967,14 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
                   className="flex-1 border rounded-xl px-3 py-2"
                   value={tempTemplateName}
                   onChange={(e) => setTempTemplateName(e.target.value)}
-                  placeholder="اسم القالب"
+                  placeholder="Template Name"
+                  onKeyPress={(e) => e.key === 'Enter' && saveTemplateName()}
+                />
+                <input 
+                  className="flex-1 border rounded-xl px-3 py-2"
+                  value={tempTemplateId}
+                  onChange={(e) => setTempTemplateId(e.target.value)}
+                  placeholder="Template ID"
                   onKeyPress={(e) => e.key === 'Enter' && saveTemplateName()}
                 />
                 <button 
