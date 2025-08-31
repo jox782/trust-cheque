@@ -272,7 +272,7 @@ function useLocalStorage(key, initial) {
 
 // --------------------------- Main App ---------------------------
 
-export default function Dashboard() {
+export default function App() {
   // Add hydration-safe mounting check
   const [isMounted, setIsMounted] = useState(false);
   
@@ -1325,7 +1325,6 @@ export default function Dashboard() {
             margin: 0;
             padding: 0;
             background: white !important;
-
           }
           header, .print\\:hidden { 
             display: none !important; 
@@ -1360,8 +1359,7 @@ export default function Dashboard() {
             text-shadow: none !important;
             background: transparent !important;
             font-weight: 600 !important;
-          }import Dashboard from './page';
-
+          }
         }
       `}</style>
     </div>

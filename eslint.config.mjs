@@ -18,8 +18,9 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      "src-tauri/**"
     ],
   },
 ];
-
+``
 export default eslintConfig;
