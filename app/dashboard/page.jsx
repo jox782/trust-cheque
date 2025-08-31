@@ -144,32 +144,17 @@ const DEFAULT_FIELDS = [
   { id: "signature", label: "التوقيع", bind: "signature", x: 80, y: 80, fontSize: 12 },
 ];
 
-// Optimized fields for compact cheques (168mm × 80mm)
-const COMPACT_FIELDS = [
-  { id: "date", label: "التاريخ", bind: "date", x: 85, y: 12, fontSize: 12 },
-  { id: "payee", label: "إسم المستفيد", bind: "payee", x: 25, y: 35, fontSize: 16 },
-  { id: "amountNum", label: "المبلغ بالأرقام", bind: "amountNum", x: 85, y: 35, fontSize: 16 },
-  { id: "amountWords", label: "المبلغ كتابة", bind: "amountWords", x: 20, y: 55, fontSize: 12 },
-  { id: "memo", label: "الغرض/ملاحظات", bind: "memo", x: 20, y: 70, fontSize: 10 },
-  { id: "signature", label: "التوقيع", bind: "signature", x: 85, y: 85, fontSize: 10 },
-];
 
 // Standard cheque dimensions by region
 const CHEQUE_DIMENSIONS = {
   egypt: { width: 177.8, height: 88.9, label: "مصر - معيار" },
-  bahrain: { width: 177.8, height: 88.9, label: "البحرين - معيار" },
-  us_personal: { width: 158.75, height: 69.85, label: "أمريكا - شخصي" },
-  us_business: { width: 203.2, height: 88.9, label: "أمريكا - تجاري" },
-  uk_standard: { width: 175, height: 88, label: "بريطانيا - معيار" },
-  compact: { width: 168, height: 80, label: "مدمج - 168×80 مم" },
-  custom: { width: 210, height: 99, label: "مخصص" }
 };
 
 // Some sample Egyptian bank templates to start with (positions are illustrative)
 const SAMPLE_TEMPLATES = [
   {
-    id: "banquemisr",
-    name: "Banque Misr (نموذج)",
+    id: "DEFAULT",
+    name: "DEFAULT",
     bg: null, // user can upload their own background
     widthMM: CHEQUE_DIMENSIONS.egypt.width, // Egyptian standard
     heightMM: CHEQUE_DIMENSIONS.egypt.height,
@@ -178,57 +163,7 @@ const SAMPLE_TEMPLATES = [
     printOffsetX: 0,
     printOffsetY: 0,
     isDefault: true, // Mark as default template
-  },
-  {
-    id: "nbe",
-    name: "NBE – البنك الأهلي المصري (نموذج)",
-    bg: null,
-    widthMM: CHEQUE_DIMENSIONS.egypt.width,
-    heightMM: CHEQUE_DIMENSIONS.egypt.height,
-    fields: DEFAULT_FIELDS.map(f => ({ ...f, y: f.y + (f.id === "date" ? 2 : 0) })),
-    dpi: 300,
-    printOffsetX: 0,
-    printOffsetY: 0,
-    isDefault: true, // Mark as default template
-  },
-  {
-    id: "cib",
-    name: "CIB – البنك التجاري الدولي (نموذج)",
-    bg: null,
-    widthMM: CHEQUE_DIMENSIONS.egypt.width,
-    heightMM: CHEQUE_DIMENSIONS.egypt.height,
-    fields: [
-      { id: "date", label: "التاريخ", bind: "date", x: 75, y: 12, fontSize: 13 },
-      { id: "payee", label: "إسم المستفيد", bind: "payee", x: 20, y: 32, fontSize: 17 },
-      { id: "amountNum", label: "المبلغ بالأرقام", bind: "amountNum", x: 78, y: 32, fontSize: 17 },
-      { id: "amountWords", label: "المبلغ كتابة", bind: "amountWords", x: 15, y: 48, fontSize: 13 },
-      { id: "memo", label: "الغرض/ملاحظات", bind: "memo", x: 15, y: 62, fontSize: 11 },
-      { id: "signature", label: "التوقيع", bind: "signature", x: 82, y: 82, fontSize: 11 },
-    ],
-    dpi: 300,
-    printOffsetX: 0,
-    printOffsetY: 0,
-    isDefault: true, // Mark as default template
-  },
-  {
-    id: "alexbank",
-    name: "بنك الإسكندرية (نموذج)",
-    bg: null,
-    widthMM: CHEQUE_DIMENSIONS.egypt.width,
-    heightMM: CHEQUE_DIMENSIONS.egypt.height,
-    fields: [
-      { id: "date", label: "التاريخ", bind: "date", x: 72, y: 10, fontSize: 12 },
-      { id: "payee", label: "إسم المستفيد", bind: "payee", x: 18, y: 28, fontSize: 16 },
-      { id: "amountNum", label: "المبلغ بالأرقام", bind: "amountNum", x: 77, y: 28, fontSize: 16 },
-      { id: "amountWords", label: "المبلغ كتابة", bind: "amountWords", x: 12, y: 44, fontSize: 13 },
-      { id: "memo", label: "الغرض/ملاحظات", bind: "memo", x: 12, y: 58, fontSize: 10 },
-      { id: "signature", label: "التوقيع", bind: "signature", x: 78, y: 78, fontSize: 10 },
-    ],
-    dpi: 300,
-    printOffsetX: 0,
-    printOffsetY: 0,
-    isDefault: true, // Mark as default template
-  },
+  }
 ];
 
 function useLocalStorage(key, initial) {
@@ -283,7 +218,7 @@ export default function Dashboard() {
   
   const [templates, setTemplates] = useLocalStorage(LSK.templates, SAMPLE_TEMPLATES);
   const [selectedTemplateId, setSelectedTemplateId] = useLocalStorage(LSK.lastTemplateId, templates?.[0]?.id || "banquemisr");
-  const currentTemplate = useMemo(() => templates.find(t => t.id === selectedTemplateId) || templates[0], [templates, selectedTemplateId]);
+  const currentTemplate = useMemo(() => templates?.find(t => t.id === selectedTemplateId) || templates[0], [templates, selectedTemplateId]);
 
   const [form, setForm] = useState({ payee: " ", amount: " ", date: " ", memo: " ", signature: " " });
   
@@ -418,6 +353,7 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
   const startEditingTemplate = () => {
     setEditingTemplate(true);
     setTempTemplateName(currentTemplate.name);
+    setTempTemplateId(currentTemplate?.id);
   };
 
   const saveTemplateName = () => {
@@ -464,8 +400,8 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
     console.log(json)
     // Skip header row
     const values = json.slice(1).map((row) => ({
-      amount: row[0],
-      name: row[1],
+      name: row[0],
+      amount: row[1],
       date: row[2],
       bank: row[3],
     }));
@@ -486,7 +422,6 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
         bank: firstRow.bank,
       });
     }
-    console.log("current",currentTemplate)
   };
 
   const handleNext = () => {
@@ -504,6 +439,7 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
         date: row.date,
         bank: row.bank,
       });
+      console.log("form",form)
     }
   };
 
@@ -522,21 +458,6 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
         date: row.date,
         bank: row.bank,
       });
-    }
-  };
-
-  const applyDimensionPreset = (presetKey) => {
-    const preset = CHEQUE_DIMENSIONS[presetKey];
-    if (preset) {
-      // Use optimized field positions for compact dimensions
-      const fieldsToUse = presetKey === 'compact' ? COMPACT_FIELDS : DEFAULT_FIELDS;
-      
-      updateTemplate(t => ({ 
-        ...t, 
-        widthMM: preset.width, 
-        heightMM: preset.height,
-        fields: fieldsToUse.map(f => ({ ...f })) // Create a copy of the fields
-      }));
     }
   };
 
@@ -686,34 +607,6 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
     }));
   };
 
-  const autoAdjustPositions = () => {
-    setButtonLoading('autoAdjust', true);
-    try {
-      // Auto-adjust field positions based on current dimensions
-      const { widthMM, heightMM } = currentTemplate;
-      
-      if (widthMM <= 170 && heightMM <= 85) {
-        // Use compact positioning for smaller cheques
-        updateTemplate(t => ({
-          ...t,
-          fields: COMPACT_FIELDS.map(f => ({ ...f }))
-        }));
-        showToast('تم ضبط المواضع للأبعاد المدمجة', 'success');
-      } else {
-        // Use default positioning for standard/larger cheques
-        updateTemplate(t => ({
-          ...t,
-          fields: DEFAULT_FIELDS.map(f => ({ ...f }))
-        }));
-        showToast('تم ضبط المواضع للأبعاد المعيارية', 'success');
-      }
-    } catch (error) {
-      showToast('فشل في ضبط المواضع', 'error');
-    } finally {
-      setButtonLoading('autoAdjust', false);
-    }
-  };
-
   const printCheque = () => {
     setButtonLoading('print', true);
     saveCheque();
@@ -858,6 +751,8 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
             <span className="text-lg text-white">🏦</span>
           </div>
+          <h1 className="text-4xl font-bold text-slate-700">مجموعة التيسير الطبية</h1>
+          <h1 className="text-4xl font-bold text-slate-700">قطاع تكنولوجيا المعلومات</h1>
           <h1 className="text-xl font-bold text-slate-700">طباعة الشيكات المصرفية</h1>
           <p className="text-sm text-slate-500 mt-2">جاري التحميل...</p>
         </div>
@@ -875,7 +770,7 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
             </div>
             <div>
               <h1 className="text-xl font-bold">طباعة الشيكات المصرفية</h1>
-              <span className="text-xs text-blue-100">تطبيق سطح المكتب المهني</span>
+              <span className="text-xs text-blue-100">مجموعة التيسير الطبية - قطاع تكنولوجيا المعلومات</span>
             </div>
           </div>
           <div className="ms-auto flex items-center gap-2">
@@ -897,7 +792,7 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
               {isLoading.print ? 'جاري التحضير...' : '🖨️ طباعة'}
             </button>
             <button 
-              className="px-3 py-1.5 rounded-2xl text-sm border bg-white text-blue-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium" 
+              className="w-20 px-3 py-1.5 rounded-2xl text-sm border bg-white text-blue-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium" 
               onClick={handleNext}
               disabled={useExcelRows.length < 1}
             >
@@ -910,14 +805,14 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
               {useExcelRows.length > 0 ? `${useCurruntRowIndex + 1} / ${useExcelRows.length}` : '0 / 0'}
             </button>
             <button 
-              className="px-3 py-1.5 rounded-2xl text-sm border bg-white text-blue-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium" 
+              className=" w-20 px-3 py-1.5 rounded-2xl text-sm border bg-white text-blue-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium" 
               onClick={handlePrev}
               disabled={useExcelRows.length < 1}
             >
               Previous
             </button>
             <button 
-              className="px-3 py-1.5 rounded-2xl text-sm border bg-white text-blue-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"             >
+              className=" rounded-2xl text-sm border bg-white text-blue-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"             >
                {/* Import Excel Button */}
             <div className=" bg-blue-50 border border-blue-200 rounded-xl">
                 <div className="relative">
@@ -927,11 +822,11 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
                     accept=".xlsx"
                     onChange={handleExcelImport}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    title="Import Excel file"
+                    title="Import Excel File"
                   />
                   <label 
                     htmlFor="template-import"
-                    className={`flex items-center justify-center px-1 w-full border-2 border-dashed rounded-lg transition-colors cursor-pointer ${
+                    className={`flex items-center justify-center px-2 w-full border-2 border-dashed rounded-lg transition-colors cursor-pointer ${
                       selectedTemplateFile 
                         ? 'border-green-400 bg-green-50' 
                         : 'border-blue-300 hover:border-blue-500 hover:bg-blue-100 bg-white'
@@ -941,7 +836,7 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
                       <span className="text-lg">{selectedTemplateFile ? '✅' : '📁'}</span>
                       <div className="text-center">
                         <div className="text-xs font-medium text-blue-700">
-                          {selectedTemplateFile ? selectedTemplateFile : 'select Excel file'}
+                          {selectedTemplateFile ? selectedTemplateFile : 'Select Excel File'}
                         </div>
                         
                       </div>
@@ -960,9 +855,64 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
         <section className="lg:col-span-2 bg-white p-4 rounded-2xl shadow print:hidden">
           <h2 className="font-semibold mb-3">البيانات</h2>
           <div className="grid grid-cols-2 gap-3">
+            <label className="col-span-2 text-sm">إسم المستفيد</label>
+            <input className="col-span-2 border rounded-xl px-3 py-2" value={form.payee} onChange={(e) => setForm({ ...form, payee: e.target.value })} />
+
+            <label className="col-span-2 text-sm">المبلغ (جنيه.قرش)</label>
+            <div className="col-span-2 space-y-2">
+              <input className="w-full border rounded-xl px-3 py-2" type="number" step="0.01" value={form.amount}
+                onChange={(e) => setForm({ ...form, amount: e.target.value })} />
+              {form.amount && (
+                <div className="text-xs text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
+                  <div className="font-medium">المعاينة:</div>
+                  <div className="mt-1">
+                    <span className="font-mono text-lg">
+                      {useArabicNumerals ? toArabicNumerals(form.amount) : form.amount}
+                    </span>
+                    <span className="mr-2 text-gray-500">
+                      ({useArabicNumerals ? 'أرقام عربية' : 'أرقام إنجليزية'})
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <label className="col-span-2 text-sm">التاريخ</label>
+            <div className="col-span-2 space-y-2">
+              <input className="w-full border rounded-xl px-3 py-2" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
+              {form.date && useArabicNumerals && (
+                <div className="text-xs text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
+                  <div className="font-medium">المعاينة:</div>
+                  <div className="mt-1">
+                    <span className="font-mono text-lg">
+                      {toArabicNumerals(form.date)}
+                    </span>
+                    <span className="mr-2 text-gray-500">(تاريخ بالأرقام العربية)</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <label className="col-span-2 text-sm">ملاحظات (اختياري)</label>
+            <input className="col-span-2 border rounded-xl px-3 py-2" value={form.memo} onChange={(e) => setForm({ ...form, memo: e.target.value })} />
+
+            <label className="col-span-2 text-sm">التوقيع (اختياري)</label>
+            <input className="col-span-2 border rounded-xl px-3 py-2" value={form.signature} onChange={(e) => setForm({ ...form, signature: e.target.value })} />
+
+            <div className="col-span-2 flex gap-2 mt-2">
+              {/* <button 
+                className="px-3 py-1.5 rounded-2xl text-sm border bg-green-50 hover:bg-green-100 disabled:opacity-50 disabled:cursor-not-allowed" 
+                onClick={saveCheque}
+                disabled={isLoading.save}
+                title="حفظ بيانات هذا الشيك في سجل الشيكات المحفوظة محلياً"
+              >
+                {isLoading.save ? 'جاري الحفظ...' : '💾 حفظ الشيك'}
+              </button> */}
+              
+            </div>
             <label className="col-span-2 text-sm">البنك / القالب</label>
             {editingTemplate ? (
-              <div className="col-span-2 flex gap-2">
+              <div className="col-span-2 gap-2">
                 <input 
                   className="flex-1 border rounded-xl px-3 py-2"
                   value={tempTemplateName}
@@ -977,6 +927,7 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
                   placeholder="Template ID"
                   onKeyPress={(e) => e.key === 'Enter' && saveTemplateName()}
                 />
+                <hr className="my-5" />
                 <button 
                   className="px-3 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 disabled:opacity-50"
                   onClick={saveTemplateName}
@@ -990,16 +941,25 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
                 >
                   ✕
                 </button>
+                <button 
+                className="px-3 py-1.5 rounded-2xl text-sm border bg-red-50 hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed" 
+                onClick={removeTemplate}
+                disabled={isLoading.removeTemplate || currentTemplate.isDefault}
+                title={currentTemplate.isDefault ? 'لا يمكن حذف القوالب الافتراضية' : 'حذف هذا القالب'}
+              >
+                {isLoading.removeTemplate ? 'جاري الحذف...' : 
+                 currentTemplate.isDefault ? '🔒 قالب افتراضي' : 'حذف القالب'}
+              </button>
               </div>
             ) : (
               <div className="col-span-2 flex gap-2">
                 <select
                   className="flex-1 border rounded-xl px-3 py-2"
-                  value={currentTemplate.id}
-                  onChange={(e) => setSelectedTemplateId(e.target.value)}
+                  value={form.bank}
+                  onChange={(e) => setForm({ ...form, bank: e.target.value })}
                 >
                   {templates.map(t => (
-                    <option key={t.id} value={t.id}>{t.name}</option>
+                    <option key={`${t}-${Math.random(6)}`} value={t.id}>{t.name}</option>
                   ))}
                 </select>
                 <button 
@@ -1056,21 +1016,7 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
                 </button>
               )}
             </div>
-
-            <label className="col-span-2 text-sm">أبعاد الشيك المعيارية</label>
-            <select
-              className="col-span-2 border rounded-xl px-3 py-2 text-sm"
-              onChange={(e) => applyDimensionPreset(e.target.value)}
-              defaultValue=""
-            >
-              <option value="">اختر أبعاد معيارية...</option>
-              {Object.entries(CHEQUE_DIMENSIONS).map(([key, dim]) => (
-                <option key={key} value={key}>
-                  {dim.label} ({dim.width} × {dim.height} مم)
-                </option>
-              ))}
-            </select>
-
+      
             <div className="col-span-2 grid grid-cols-3 gap-2 text-sm">
               <div>
                 <label className="block text-xs">العرض (مم)</label>
@@ -1100,7 +1046,7 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
                   onChange={(e) => updateTemplate(t => ({ ...t, dpi: Number(e.target.value || 300) }))} />
               </div>
             </div>
-
+              {/* X Y Section */}
             <div className="col-span-2 mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-xl">
               <label className="block text-sm font-medium mb-2">ضبط محاذاة الطباعة (مم)</label>
               <div className="grid grid-cols-2 gap-2 text-sm">
@@ -1170,77 +1116,12 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
                 >
                   <span
                     className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      useArabicNumerals ? 'translate-x-6' : 'translate-x-1'
+                      useArabicNumerals ? '-translate-x-6' : 'translate-x-1'
                     }`}
                   />
                 </button>
               </div>
             </div>
-
-            <label className="col-span-2 text-sm">إسم المستفيد</label>
-            <input className="col-span-2 border rounded-xl px-3 py-2" value={form.payee} onChange={(e) => setForm({ ...form, payee: e.target.value })} />
-
-            <label className="col-span-2 text-sm">المبلغ (جنيه.قرش)</label>
-            <div className="col-span-2 space-y-2">
-              <input className="w-full border rounded-xl px-3 py-2" type="number" step="0.01" value={form.amount}
-                onChange={(e) => setForm({ ...form, amount: e.target.value })} />
-              {form.amount && (
-                <div className="text-xs text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
-                  <div className="font-medium">المعاينة:</div>
-                  <div className="mt-1">
-                    <span className="font-mono text-lg">
-                      {useArabicNumerals ? toArabicNumerals(form.amount) : form.amount}
-                    </span>
-                    <span className="mr-2 text-gray-500">
-                      ({useArabicNumerals ? 'أرقام عربية' : 'أرقام إنجليزية'})
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <label className="col-span-2 text-sm">التاريخ</label>
-            <div className="col-span-2 space-y-2">
-              <input className="w-full border rounded-xl px-3 py-2" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
-              {form.date && useArabicNumerals && (
-                <div className="text-xs text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
-                  <div className="font-medium">المعاينة:</div>
-                  <div className="mt-1">
-                    <span className="font-mono text-lg">
-                      {toArabicNumerals(form.date)}
-                    </span>
-                    <span className="mr-2 text-gray-500">(تاريخ بالأرقام العربية)</span>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <label className="col-span-2 text-sm">ملاحظات</label>
-            <input className="col-span-2 border rounded-xl px-3 py-2" value={form.memo} onChange={(e) => setForm({ ...form, memo: e.target.value })} />
-
-            <label className="col-span-2 text-sm">التوقيع (اختياري – نص)</label>
-            <input className="col-span-2 border rounded-xl px-3 py-2" value={form.signature} onChange={(e) => setForm({ ...form, signature: e.target.value })} />
-
-            <div className="col-span-2 flex gap-2 mt-2">
-              <button 
-                className="px-3 py-1.5 rounded-2xl text-sm border bg-green-50 hover:bg-green-100 disabled:opacity-50 disabled:cursor-not-allowed" 
-                onClick={saveCheque}
-                disabled={isLoading.save}
-                title="حفظ بيانات هذا الشيك في سجل الشيكات المحفوظة محلياً"
-              >
-                {isLoading.save ? 'جاري الحفظ...' : '💾 حفظ الشيك'}
-              </button>
-              <button 
-                className="px-3 py-1.5 rounded-2xl text-sm border bg-red-50 hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed" 
-                onClick={removeTemplate}
-                disabled={isLoading.removeTemplate || currentTemplate.isDefault}
-                title={currentTemplate.isDefault ? 'لا يمكن حذف القوالب الافتراضية' : 'حذف هذا القالب'}
-              >
-                {isLoading.removeTemplate ? 'جاري الحذف...' : 
-                 currentTemplate.isDefault ? '🔒 قالب افتراضي' : 'حذف القالب'}
-              </button>
-            </div>
-            
             {/* Template Import/Export Section */}
             <div className="col-span-2 mt-4 p-3 bg-blue-50 border border-blue-200 rounded-xl">
               <h3 className="text-sm font-medium mb-2">🔄 إدارة القوالب</h3>
@@ -1298,17 +1179,6 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
               </p>
             </div>
            
-            
-            <div className="col-span-2 mt-2">
-              <button 
-                className="w-full px-3 py-2 rounded-2xl text-sm border border-blue-300 bg-blue-50 hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" 
-                onClick={autoAdjustPositions}
-                disabled={isLoading.autoAdjust}
-                title="تعديل مواضع النصوص تلقائياً حسب أبعاد الشيك"
-              >
-                {isLoading.autoAdjust ? 'جاري الضبط...' : 'ضبط المواضع تلقائياً للأبعاد الحالية'}
-              </button>
-            </div>
           </div>
         </section>
 
@@ -1416,6 +1286,7 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
                 {form.amount && (
                   <div className="flex items-center gap-4">
                     <span>المبلغ بالأرقام: <span className="font-mono font-medium text-slate-700">{amountNum || "—"}</span></span>
+                    {/* {form.bank && <span>البنك حسب الاكسيل  :<span className="font-mono font-medium text-slate-700"> {form.bank || "—"} </span></span>} */}
                     <span className="text-xs text-amber-600">
                       ({useArabicNumerals ? 'أرقام عربية' : 'أرقام إنجليزية'})
                     </span>
@@ -1434,7 +1305,6 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
 
                       <div className="text-xs text-slate-500 mt-2 print:hidden">
             <p>نصيحة: للحصول على محاذاة دقيقة على ورقة الشيك الأصلية، قم بطباعة نسخة تجريبية ثم استخدم إعدادات "ضبط محاذاة الطباعة" لتصحيح أي إزاحة.</p>
-            <p className="mt-1">الأبعاد المعيارية: مصر/البحرين (177.8×88.9 مم)، أمريكا الشخصي (158.75×69.85 مم)، أمريكا التجاري (203.2×88.9 مم)</p>
             <p className="mt-1 text-amber-600">إذا كان النص ينزاح 70مم يساراً عند الطباعة، اضغط "إصلاح الإزاحة 70مم يساراً" في إعدادات المحاذاة.</p>
           </div>
         </section>
