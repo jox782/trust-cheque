@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "trust-cheque-printing-solution",
+  "productName": "Elite-Cheque-Printing-Solution",
   "version": "2.0.0",
-  "identifier": "com.yousef.chequeprinter",
+  "identifier": "com.yousef.elitecheque",
   "build": {
     "frontendDist": "../out",
     "devUrl": "http://localhost:3000",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "trust-cheque-printing-solution",
+        "title": "Elite-Cheque",
         "width": 800,
         "height": 600,
         "resizable": true,
