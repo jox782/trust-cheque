@@ -361,14 +361,14 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
       showToast('Please Enter Template Name', 'error');
       return;
     }
-    if (!tempTemplateId.trim()) {
-      showToast('Please Enter Template ID', 'error');
-      return;
-    }
+    // if (!tempTemplateId.trim()) {
+    //   showToast('Please Enter Template ID', 'error');
+    //   return;
+    // }
     
     setButtonLoading('saveTemplateName', true);
     try {
-      updateTemplate(t => ({ ...t, name: tempTemplateName.trim(),id: tempTemplateId.trim() }));
+      updateTemplate(t => ({ ...t, name: tempTemplateName.trim() }));
       setEditingTemplate(false);
       showToast('تم تحديث اسم القالب بنجاح', 'success');
     } catch (error) {
@@ -751,6 +751,7 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
             <span className="text-lg text-white">🏦</span>
           </div>
+          <h1 className="text-4xl font-bold text-slate-700">Elite Cheque</h1>
           <h1 className="text-4xl font-bold text-slate-700">مجموعة التيسير الطبية</h1>
           <h1 className="text-4xl font-bold text-slate-700">قطاع تكنولوجيا المعلومات</h1>
           <h1 className="text-xl font-bold text-slate-700">طباعة الشيكات المصرفية</h1>
@@ -769,8 +770,8 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
               <span className="text-lg">🏦</span>
             </div>
             <div>
-              <h1 className="text-xl font-bold">طباعة الشيكات المصرفية</h1>
-              <span className="text-xs text-blue-100">مجموعة التيسير الطبية - قطاع تكنولوجيا المعلومات</span>
+              <h1 className="text-xl font-bold">Elite Cheque</h1>
+              <span className="text-xs text-blue-100">THG - IT Department</span>
             </div>
           </div>
           <div className="ms-auto flex items-center gap-2">
@@ -784,19 +785,13 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
             >
               {isLoading.addTemplate ? 'جاري الإنشاء...' : '➕ قالب جديد'}
             </button>
-            <button 
-              className="px-3 py-1.5 rounded-2xl text-sm border bg-white text-blue-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium" 
-              onClick={printCheque}
-              disabled={isLoading.print}
-            >
-              {isLoading.print ? 'جاري التحضير...' : '🖨️ طباعة'}
-            </button>
+            
             <button 
               className="w-20 px-3 py-1.5 rounded-2xl text-sm border bg-white text-blue-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium" 
-              onClick={handleNext}
+              onClick={handlePrev}
               disabled={useExcelRows.length < 1}
             >
-              Next
+              السابق
             </button>
             <button 
               className="px-3 py-1.5 rounded-2xl text-sm border bg-white text-blue-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium" 
@@ -804,12 +799,21 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
             >
               {useExcelRows.length > 0 ? `${useCurruntRowIndex + 1} / ${useExcelRows.length}` : '0 / 0'}
             </button>
+
             <button 
               className=" w-20 px-3 py-1.5 rounded-2xl text-sm border bg-white text-blue-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium" 
-              onClick={handlePrev}
+              onClick={handleNext}
               disabled={useExcelRows.length < 1}
             >
-              Previous
+            التالي
+            </button>
+
+            <button 
+              className="px-3 py-1.5 rounded-2xl text-sm border bg-white text-blue-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium" 
+              onClick={printCheque}
+              disabled={isLoading.print}
+            >
+              {isLoading.print ? 'جاري التحضير...' : '🖨️ طباعة'}
             </button>
             <button 
               className=" rounded-2xl text-sm border bg-white text-blue-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"             >
@@ -862,35 +866,11 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
             <div className="col-span-2 space-y-2">
               <input className="w-full border rounded-xl px-3 py-2" type="number" step="0.01" value={form.amount}
                 onChange={(e) => setForm({ ...form, amount: e.target.value })} />
-              {form.amount && (
-                <div className="text-xs text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
-                  <div className="font-medium">المعاينة:</div>
-                  <div className="mt-1">
-                    <span className="font-mono text-lg">
-                      {useArabicNumerals ? toArabicNumerals(form.amount) : form.amount}
-                    </span>
-                    <span className="mr-2 text-gray-500">
-                      ({useArabicNumerals ? 'أرقام عربية' : 'أرقام إنجليزية'})
-                    </span>
-                  </div>
-                </div>
-              )}
             </div>
 
             <label className="col-span-2 text-sm">التاريخ</label>
             <div className="col-span-2 space-y-2">
               <input className="w-full border rounded-xl px-3 py-2" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
-              {form.date && useArabicNumerals && (
-                <div className="text-xs text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
-                  <div className="font-medium">المعاينة:</div>
-                  <div className="mt-1">
-                    <span className="font-mono text-lg">
-                      {toArabicNumerals(form.date)}
-                    </span>
-                    <span className="mr-2 text-gray-500">(تاريخ بالأرقام العربية)</span>
-                  </div>
-                </div>
-              )}
             </div>
 
             <label className="col-span-2 text-sm">ملاحظات (اختياري)</label>
@@ -920,29 +900,29 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
                   placeholder="Template Name"
                   onKeyPress={(e) => e.key === 'Enter' && saveTemplateName()}
                 />
-                <input 
+                {/* <input 
                   className="flex-1 border rounded-xl px-3 py-2"
                   value={tempTemplateId}
                   onChange={(e) => setTempTemplateId(e.target.value)}
                   placeholder="Template ID"
                   onKeyPress={(e) => e.key === 'Enter' && saveTemplateName()}
-                />
+                /> */}
                 <hr className="my-5" />
                 <button 
-                  className="px-3 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 disabled:opacity-50"
+                  className="px-3 py-2 m-2 bg-green-500 text-white rounded-xl hover:bg-green-600 disabled:opacity-50"
                   onClick={saveTemplateName}
                   disabled={isLoading.saveTemplateName}
                 >
                   {isLoading.saveTemplateName ? '...' : '✓'}
                 </button>
                 <button 
-                  className="px-3 py-2 bg-gray-500 text-white rounded-xl hover:bg-gray-600"
+                  className="px-3 py-2 m-2 bg-gray-500 text-white rounded-xl hover:bg-gray-600"
                   onClick={cancelEditingTemplate}
                 >
                   ✕
                 </button>
                 <button 
-                className="px-3 py-1.5 rounded-2xl text-sm border bg-red-50 hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed" 
+                className="px-3 py-2 rounded-xl bg-red-400 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed" 
                 onClick={removeTemplate}
                 disabled={isLoading.removeTemplate || currentTemplate.isDefault}
                 title={currentTemplate.isDefault ? 'لا يمكن حذف القوالب الافتراضية' : 'حذف هذا القالب'}
@@ -955,8 +935,8 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
               <div className="col-span-2 flex gap-2">
                 <select
                   className="flex-1 border rounded-xl px-3 py-2"
-                  value={form.bank}
-                  onChange={(e) => setForm({ ...form, bank: e.target.value })}
+                  value={currentTemplate.id}
+                  onChange={(e) => setSelectedTemplateId(e.target.value)}
                 >
                   {templates.map(t => (
                     <option key={`${t}-${Math.random(6)}`} value={t.id}>{t.name}</option>
@@ -1217,7 +1197,7 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
                 
                 </>
               )}
-              
+              {console.log(currentTemplate)}
               {currentTemplate.fields.map((f) => {
                 const value = (f.bind === "amountNum"
                   ? amountNum
@@ -1237,14 +1217,14 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
                     key={f.id}
                     onMouseDown={(e) => onMouseDownField(e, f)}
                     className={`absolute select-none cursor-${editMode ? "move" : "default"} ${activeFieldId === f.id ? "ring-2 ring-amber-400" : ""}`}
-                    style={{ left: `${f.x}%`, top: `${f.y}%`, transform: "translate(-50%, -50%)" }}
+                    style={{ left: `${f.x}%`, top: `${f.y}%`, transform: "translate(-100%, 0%)", width: '55%' }}
                     title={editMode ? f.label : undefined}
                   >
                     <div
                       className={`px-1 font-medium ${f.bind === 'amountNum' ? 'font-bold text-blue-900' : f.bind === 'payee' ? 'font-semibold' : ''}`}
                       style={{ 
                         fontSize: `${f.fontSize || 14}px`, 
-                        lineHeight: 1.2,
+                        lineHeight: 2.3,
                         fontFamily: f.bind === 'amountNum' || f.bind === 'date' ? 'monospace' : 'inherit',
                         letterSpacing: f.bind === 'amountNum' ? '1px' : 'normal'
                       }}
