@@ -1167,7 +1167,7 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
                           {selectedTemplateFile ? selectedTemplateFile : 'اختر ملف JSON'}
                         </div>
                         <div className="text-xs text-blue-500">
-                          {selectedTemplateFile ? 'جاري المعالجة...' : 'قالب واحد أو متعدد'}
+                          {selectedTemplateFile ? 'جاري المعالجة...' : 'قالب واحد'}
                         </div>
                       </div>
                     </div>
@@ -1175,7 +1175,7 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
                 </div>
               </div>
               <p className="text-xs text-blue-600 mt-2">
-                💡 نصيحة: صدّر قوالبك للاحتفاظ بها بعد التحديثات
+                💡 نصيحة: صدّر قوالبك للاحتفاظ بها
               </p>
             </div>
            
@@ -1251,7 +1251,8 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
                     >
                       {value}
                     </div>
-                    {editMode && (
+                    {/* Font Size Edit Box */}
+                    {/* {editMode && (
                       <div className="mt-1 flex items-center gap-1 text-[10px] bg-white/80 rounded px-1 border">
                         <span>{f.label}</span>
                         <input
@@ -1274,7 +1275,7 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
                           title="حجم الخط (8-72)"
                         />
                       </div>
-                    )}
+                    )} */}
                   </div>
                 );
               })}
