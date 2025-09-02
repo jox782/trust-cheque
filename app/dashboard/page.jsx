@@ -140,6 +140,7 @@ const DEFAULT_FIELDS = [
   { id: "payee", label: "إسم المستفيد", bind: "payee", x: 15, y: 30, fontSize: 18 },
   { id: "amountNum", label: "المبلغ بالأرقام", bind: "amountNum", x: 75, y: 30, fontSize: 18 },
   { id: "amountWords", label: "المبلغ كتابة", bind: "amountWords", x: 10, y: 45, fontSize: 14 },
+  { id: "amountWords2", label: "2المبلغ كتابة", bind: "amountWords2", x: 10, y: 45, fontSize: 14 },
   { id: "memo", label: "الغرض/ملاحظات", bind: "memo", x: 10, y: 60, fontSize: 12 },
   { id: "signature", label: "التوقيع", bind: "signature", x: 80, y: 80, fontSize: 12 },
 ];
@@ -392,7 +393,7 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
       return;
     }
      
-
+    let amountWordsEx = "";
     const data = await file.arrayBuffer();
     const workbook = XLSX.read(data);
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -1197,8 +1198,24 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
                 
                 </>
               )}
-              {console.log(currentTemplate)}
+              
               {currentTemplate.fields.map((f) => {
+                console.log('Rendering field:', f);
+                console.log('Form data:', form);
+                console.log('currentTemp', currentTemplate);
+                let start = "";
+                let end = "";
+                let space = "";
+
+                if(f.bind === 'amountNum'){
+                  start = "#"
+                  end = "#"
+                }
+                if(f.bind === 'amountWords'){
+                  start = "فقط" 
+                  end = "لا غير"
+                  space = " "
+                }
                 const value = (f.bind === "amountNum"
                   ? amountNum
                   : f.bind === "amountWords"
@@ -1212,12 +1229,22 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
                   : f.bind === "signature"
                   ? form.signature
                   : "");
+
+                  {/* if(value.length > 50 && f.bind === "amountWords2" ){
+                    let firstPart = value.slice(0, 50); // initial cut
+                    const lastSpaceIndex = firstPart.lastIndexOf(" ");
+
+                    if (lastSpaceIndex !== -1) {
+                    firstPart = value.slice(0, lastSpaceIndex);
+                    }
+                    amountWordsEx = value.slice(firstPart.length).trim();
+                  } */}
                 return (
                   <div
                     key={f.id}
                     onMouseDown={(e) => onMouseDownField(e, f)}
                     className={`absolute select-none cursor-${editMode ? "move" : "default"} ${activeFieldId === f.id ? "ring-2 ring-amber-400" : ""}`}
-                    style={{ left: `${f.x}%`, top: `${f.y}%`, transform: "translate(-100%, 0%)", width: '55%' }}
+                    style={{ left: `${f.x}%`, top: `${f.y}%`, transform: "translate(-100%, 0%)", width: '50%' }}
                     title={editMode ? f.label : undefined}
                   >
                     <div
@@ -1229,7 +1256,7 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
                         letterSpacing: f.bind === 'amountNum' ? '1px' : 'normal'
                       }}
                     >
-                      {value}
+                      {`${start}${space}${value}${space}${end}`}
                     </div>
                     {/* Font Size Edit Box */}
                     {/* {editMode && (
