@@ -1,6 +1,9 @@
 "use client"
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import * as XLSX from "xlsx";
+import dayjs from "dayjs";
+import "dayjs/locale/ar"; // Arabic locale
+
 
 /**
  * Arabic Cheque Printer (Egypt) – Single-file React App
@@ -122,6 +125,7 @@ function formatArabicCurrencyWords(amount, currencyMain = "جنيه", currencySu
     : `${integerWords} ${mainUnit}`;
 }
 
+
 // Convert Western numerals (0123456789) to Arabic-Indic numerals (٠١٢٣٤٥٦٧٨٩)
 function toArabicNumerals(str) {
   const arabicNumerals = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
@@ -136,15 +140,29 @@ function toArabicNumerals(str) {
 
 // Default fields used on most Egyptian cheques
 const DEFAULT_FIELDS = [
-  { id: "date", label: "التاريخ", bind: "date", x: 70, y: 8, fontSize: 14 },
-  { id: "payee", label: "إسم المستفيد", bind: "payee", x: 15, y: 30, fontSize: 18 },
-  { id: "amountNum", label: "المبلغ بالأرقام", bind: "amountNum", x: 75, y: 30, fontSize: 18 },
-  { id: "amountWords", label: "المبلغ كتابة", bind: "amountWords", x: 10, y: 45, fontSize: 14 },
+  { id: "date", label: "التاريخ", bind: "date", x: 88, y: 3, fontSize: 14 },
+  { id: "payee", label: "إسم المستفيد", bind: "payee", x: 65, y: 26, fontSize: 18 },
+  { id: "amountNum", label: "المبلغ بالأرقام", bind: "amountNum", x: 98, y: 37, fontSize: 18 },
+  { id: "amountWords", label: "المبلغ كتابة", bind: "amountWords", x: 62, y: 45, fontSize: 14 },
   { id: "amountWords2", label: "2المبلغ كتابة", bind: "amountWords2", x: 10, y: 45, fontSize: 14 },
   { id: "memo", label: "الغرض/ملاحظات", bind: "memo", x: 10, y: 60, fontSize: 12 },
   { id: "signature", label: "التوقيع", bind: "signature", x: 80, y: 80, fontSize: 12 },
 ];
 
+function excelDateToJSDate(serial) {
+  const utc_days = Math.floor(serial - 25569);
+  const utc_value = utc_days * 86400; 
+  const date_info = new Date(utc_value * 1000);
+  return new Date(
+    date_info.getUTCFullYear(),
+    date_info.getUTCMonth(),
+    date_info.getUTCDate()
+  );
+}
+
+// Convert Western digits 0-9 → Arabic-Indic digits
+const toArabicNumbers = (str) => 
+  str.replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
 
 // Standard cheque dimensions by region
 const CHEQUE_DIMENSIONS = {
@@ -266,6 +284,7 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
     return formatArabicCurrencyWords(n, "جنيه مصري", "قرش");
   }, [form.amount]);
 
+  let amountWords2 = "";
   const chequeRef = useRef(null);
 
   // mm to px helper (approx using 96dpi by default for screen; print will scale)
@@ -871,7 +890,7 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
 
             <label className="col-span-2 text-sm">التاريخ</label>
             <div className="col-span-2 space-y-2">
-              <input className="w-full border rounded-xl px-3 py-2" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
+              <input className="w-full border rounded-xl px-3 py-2" type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
             </div>
 
             <label className="col-span-2 text-sm">ملاحظات (اختياري)</label>
@@ -1224,21 +1243,30 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
                   ? (useArabicNumerals ? toArabicNumerals(form.date) : form.date)
                   : f.bind === "payee"
                   ? form.payee
-                  : f.bind === "memo"
+                  : "");
+                  
+
+                
+            {/* ? amountWords
+                  : f.bind === "amountWords2" */}
+                  {/* if(value.length > 50 && f.bind === "amountWords" ){
+                    let firstPart = value.slice(0, 50); // initial cut
+                    const lastSpaceIndex = firstPart.lastIndexOf(" ");
+  : f.bind === "memo"
                   ? form.memo
                   : f.bind === "signature"
                   ? form.signature
-                  : "");
-
-                  {/* if(value.length > 50 && f.bind === "amountWords2" ){
-                    let firstPart = value.slice(0, 50); // initial cut
-                    const lastSpaceIndex = firstPart.lastIndexOf(" ");
-
                     if (lastSpaceIndex !== -1) {
                     firstPart = value.slice(0, lastSpaceIndex);
                     }
-                    amountWordsEx = value.slice(firstPart.length).trim();
-                  } */}
+                    amountWords2 = value.slice(firstPart.length).trim();
+                    console.log(amountWords2)
+                  }
+                  
+                  if(f.bind === "amountWords2" ){
+                    console.log('amountWords2 set to:', amountWords2);
+                  }
+                   */}
                 return (
                   <div
                     key={f.id}
@@ -1256,7 +1284,9 @@ const [useCurruntRowIndex, setUseCurruntRowIndex] = useState(null)
                         letterSpacing: f.bind === 'amountNum' ? '1px' : 'normal'
                       }}
                     >
-                      {`${start}${space}${value}${space}${end}`}
+                    
+
+                      {f.bind ==="date" ? `${dayjs(excelDateToJSDate(45123)).format("YYYY/MM/DD")}` :`${start}${space}${value}${space}${end}`}
                     </div>
                     {/* Font Size Edit Box */}
                     {/* {editMode && (

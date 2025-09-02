@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Elite-Cheque-Printing-Solution",
   "version": "2.0.0",
-  "identifier": "com.yousef.elitecheque",
+  "identifier": "com.yousef-abdelkariem.elitecheque",
   "build": {
     "frontendDist": "../out",
     "devUrl": "http://localhost:3000",
